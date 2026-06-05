@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -84,6 +83,24 @@
             transform: scale(1);
         }
 
+        /* Music Control Button Animation */
+        .music-control {
+            opacity: 0;
+            transform: translateY(20px) translateX(-50%);
+            transition: opacity 3s ease-in-out, transform 3s ease-in-out;
+            pointer-events: none;
+            position: absolute;
+            bottom: 30px;
+            left: 50%;
+            z-index: 50;
+        }
+        
+        .music-control.show {
+            opacity: 1;
+            transform: translateY(0) translateX(-50%);
+            pointer-events: auto;
+        }
+
         /* Gemoy Sticker Animation (Panda) */
         .panda-container {
             position: absolute;
@@ -134,7 +151,7 @@
 </head>
 <body class="w-full h-screen relative flex items-center justify-center text-gray-800">
 
-    <!-- Audio Element (Gunakan link lagu favorit kalian, ini placeholder instrumen romantis) -->
+    <!-- Audio Element -->
     <audio id="bgm" loop>
         <source src="ssstik.io_1780696379226.mp3" type="audio/mpeg">
     </audio>
@@ -204,6 +221,11 @@
         </div>
     </div>
 
+    <!-- Music Control Button (Muncul di akhir) -->
+    <button id="music-btn" class="music-control px-5 py-2 bg-white/70 backdrop-blur-sm border border-pink-300 rounded-full text-pink-600 font-medium hover:bg-pink-100 transition-colors shadow-[0_0_15px_rgba(244,114,182,0.4)] flex items-center justify-center gap-2 text-sm md:text-base">
+        ⏸️ Jeda Lagu
+    </button>
+
     <!-- Start Screen Overlay -->
     <div id="start-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center">
         <h1 class="text-3xl md:text-5xl font-bold text-pink-600 mb-8 font-['Dancing_Script'] drop-shadow-md text-center px-4">Ada pesan untukmu...</h1>
@@ -219,8 +241,11 @@
             const playBtn = document.getElementById('play-btn');
             const audio = document.getElementById('bgm');
             const finalMessage = document.getElementById('final-message');
+            const musicBtn = document.getElementById('music-btn');
             const gemoySticker = document.getElementById('gemoy-sticker');
             const particlesContainer = document.getElementById('particles');
+
+            let isPlaying = true;
 
             // Data Timing Lirik (dalam milidetik)
             const timings = [
@@ -268,7 +293,7 @@
                     startScreen.style.display = 'none';
                 }, 1000);
 
-                // Mainkan musik (Tangkap error jika browser memblokir, animasi tetap jalan)
+                // Mainkan musik
                 audio.volume = 0.5;
                 let audioPromise = audio.play();
                 if (audioPromise !== undefined) {
@@ -298,12 +323,26 @@
                     }, lyric.hide);
                 });
 
-                // Munculkan pesan final
+                // Munculkan pesan final DAN tombol musik
                 setTimeout(() => {
                     finalMessage.classList.add('show');
+                    musicBtn.classList.add('show');
                 }, finalMessageTime);
+            });
+
+            // Logika Tombol Play/Pause Musik
+            musicBtn.addEventListener('click', () => {
+                if (isPlaying) {
+                    audio.pause();
+                    musicBtn.innerHTML = '▶️ Putar Lagu';
+                } else {
+                    audio.play();
+                    musicBtn.innerHTML = '⏸️ Jeda Lagu';
+                }
+                isPlaying = !isPlaying;
             });
         });
     </script>
 </body>
 </html>
+
