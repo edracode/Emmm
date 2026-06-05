@@ -7,11 +7,18 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@600;700&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Base Styles & Typography */
-        body {
-            font-family: 'Quicksand', sans-serif;
+        /* KUNCI LAYAR AGAR TIDAK BISA DI-SCROLL SAMA SEKALI */
+        html, body {
+            width: 100%;
+            height: 100%;
             margin: 0;
-            overflow: hidden;
+            padding: 0;
+            overflow: hidden !important;
+            position: fixed;
+            top: 0;
+            left: 0;
+            touch-action: none; /* Mencegah efek swipe/scroll di layar sentuh */
+            font-family: 'Quicksand', sans-serif;
             background: linear-gradient(135deg, #fce4ec, #f3e5f5, #fff);
             background-size: 400% 400%;
             animation: gradientBG 15s ease infinite;
@@ -50,7 +57,7 @@
             0% { transform: translateY(0) rotate(0deg); opacity: 0; }
             10% { opacity: 0.6; }
             90% { opacity: 0.6; }
-            100% { transform: translateY(-100dvh) rotate(360deg); opacity: 0; }
+            100% { transform: translateY(-100vh) rotate(360deg); opacity: 0; }
         }
 
         /* Lyric Animations */
@@ -62,8 +69,9 @@
             position: absolute;
             width: 100%;
             text-align: center;
-            padding: 0 1rem;
+            padding: 0 1.5rem;
             box-sizing: border-box;
+            pointer-events: none;
         }
 
         .lyric-text.show {
@@ -71,36 +79,23 @@
             transform: translateY(0);
         }
 
-        /* Final Message Styling */
-        .final-message {
-            font-family: 'Dancing Script', cursive;
+        /* Container Pesan Final & Tombol Musik (Di Tengah Layar) */
+        #final-container {
             opacity: 0;
             transform: scale(0.9);
             transition: opacity 3s ease-in-out, transform 3s ease-in-out;
-            text-shadow: 0 0 15px rgba(255, 182, 193, 0.8), 0 0 5px rgba(255, 255, 255, 0.8);
+            pointer-events: none; /* Awalnya tidak bisa diklik */
         }
 
-        .final-message.show {
+        #final-container.show {
             opacity: 1;
             transform: scale(1);
+            pointer-events: auto; /* Tombol di dalamnya jadi bisa diklik */
         }
 
-        /* Music Control Button Animation */
-        .music-control {
-            opacity: 0;
-            transform: translateY(20px) translateX(-50%);
-            transition: opacity 3s ease-in-out, transform 3s ease-in-out;
-            pointer-events: none;
-            position: absolute;
-            bottom: 6vh; /* Aman untuk mobile */
-            left: 50%;
-            z-index: 50;
-        }
-        
-        .music-control.show {
-            opacity: 1;
-            transform: translateY(0) translateX(-50%);
-            pointer-events: auto;
+        .final-message {
+            font-family: 'Dancing Script', cursive;
+            text-shadow: 0 0 15px rgba(255, 182, 193, 0.8), 0 0 5px rgba(255, 255, 255, 0.8);
         }
 
         /* Gemoy Sticker Animation (Panda) */
@@ -111,12 +106,12 @@
 
         .panda-arm-right {
             animation: wave 2s ease-in-out infinite alternate;
-            transform-origin: 150px 140px;
+            transform-origin: 135px 145px; /* Titik poros lengan kanan diperbaiki */
         }
         
         .heart-beat {
             animation: heartbeat 1.2s infinite ease-in-out;
-            transform-origin: 100px 125px; /* Pusat detak pas di tengah hati */
+            transform-origin: 100px 125px; 
         }
 
         @keyframes gentleNod {
@@ -144,9 +139,9 @@
         }
     </style>
 </head>
-<body class="w-full h-[100dvh] relative flex items-center justify-center text-gray-800 overflow-hidden">
+<body class="text-gray-800">
 
-    <!-- Audio Element -->
+    <!-- Audio Element (Sesuai source aslimu) -->
     <audio id="bgm" loop>
         <source src="ssstik.io_1780696379226.mp3" type="audio/mpeg">
     </audio>
@@ -159,9 +154,9 @@
     <!-- Particles Container -->
     <div id="particles" class="absolute inset-0 overflow-hidden pointer-events-none z-0"></div>
 
-    <!-- Cute Panda SVG Sticker (Responsive Sizing) -->
-    <div class="absolute bottom-24 right-4 w-24 h-24 md:bottom-10 md:right-10 md:w-32 md:h-32 opacity-90 z-10 hidden" id="gemoy-sticker">
-        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-md">
+    <!-- Cute Panda SVG Sticker (Perbaikan Tangan Copot!) -->
+    <div class="absolute bottom-6 right-2 w-28 h-28 md:bottom-10 md:right-10 md:w-36 md:h-36 opacity-95 z-10 hidden" id="gemoy-sticker">
+        <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" class="w-full h-full drop-shadow-lg">
             <g class="panda-head">
                 <!-- Ears -->
                 <circle cx="50" cy="60" r="25" fill="#2d3436" />
@@ -184,47 +179,52 @@
             </g>
             <!-- Body -->
             <ellipse cx="100" cy="170" rx="55" ry="45" fill="#ffffff" />
-            <!-- Arms -->
-            <path d="M 50 140 Q 30 160 50 180" fill="none" stroke="#2d3436" stroke-width="15" stroke-linecap="round" />
+            <!-- Arms (Tangan Panda Dimasukkan Sedikit Ke Dalam Badan Agar Menempel) -->
+            <!-- Lengan Kiri -->
+            <path d="M 65 145 Q 40 160 55 185" fill="none" stroke="#2d3436" stroke-width="14" stroke-linecap="round" />
+            <!-- Lengan Kanan Melambai (Sudah Tidak Copot Lagi) -->
             <g class="panda-arm-right">
-                <path d="M 150 140 Q 170 160 150 180" fill="none" stroke="#2d3436" stroke-width="15" stroke-linecap="round" />
+                <path d="M 135 145 Q 160 160 145 185" fill="none" stroke="#2d3436" stroke-width="14" stroke-linecap="round" />
             </g>
             <!-- Perfect Heart in hand -->
             <path d="M100,150 C100,150 75,125 75,110 C75,95 95,95 100,110 C105,95 125,95 125,110 C125,125 100,150 100,150 Z" fill="#ff4757" class="heart-beat"/>
         </svg>
     </div>
 
-    <!-- Main Content Area -->
-    <div class="relative z-10 w-full max-w-4xl px-4 flex flex-col items-center justify-center h-full">
+    <!-- Area Konten Utama -->
+    <div class="absolute inset-0 z-10 w-full flex flex-col items-center justify-center pointer-events-none">
         
-        <!-- Lyrics Container -->
-        <div id="lyrics-box" class="relative w-full h-40 md:h-48 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-gray-800">
-            <!-- Lyrics will be injected here via JS -->
+        <!-- Lirik Lagu -->
+        <div id="lyrics-box" class="relative w-full h-40 flex items-center justify-center text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-medium text-gray-800 -mt-20">
             <div id="lyric-0" class="lyric-text">Ungkapkan apa yang kurasa</div>
             <div id="lyric-1" class="lyric-text leading-tight">
                 Di hatiku tertulis namamu<br>
-                <span class="text-xl sm:text-2xl md:text-3xl text-pink-600 mt-2 md:mt-3 block font-semibold">(Denisya Aufa Khairan / Humairah)</span>
+                <span class="text-xl sm:text-2xl md:text-3xl text-pink-600 mt-2 block font-semibold">(Denisya Aufa Khairan / Humairah)</span>
             </div>
             <div id="lyric-2" class="lyric-text">Serta di setiap langkahku</div>
             <div id="lyric-3" class="lyric-text">Semua kasihku hanya untukmu</div>
             <div id="lyric-4" class="lyric-text">Izinkan aku bersamamu</div>
         </div>
 
-        <!-- Final Message -->
-        <div id="final-message" class="final-message absolute text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-pink-700 text-center w-full px-4 mt-8 md:mt-10 pointer-events-none leading-snug md:leading-normal">
-            Humai, jangan tinggalkan mas,<br>mas mohon... 🥺🤍
-        </div>
     </div>
 
-    <!-- Music Control Button (Muncul di akhir) -->
-    <button id="music-btn" class="music-control px-5 py-2 bg-white/70 backdrop-blur-md border border-pink-300 rounded-full text-pink-600 font-medium hover:bg-pink-100 transition-colors shadow-[0_0_15px_rgba(244,114,182,0.4)] flex items-center justify-center gap-2 text-sm md:text-base outline-none">
-        ⏸️ Jeda Lagu
-    </button>
+    <!-- Container Pesan Final & Tombol Pause (Tengah Layar) -->
+    <div id="final-container" class="absolute inset-0 flex flex-col items-center justify-center z-20 pb-10">
+        <!-- Teks Final -->
+        <div class="final-message text-4xl sm:text-5xl md:text-6xl lg:text-7xl text-pink-700 text-center leading-snug md:leading-normal px-4">
+            Humai, jangan tinggalkan mas,<br>mas mohon... 🥺🤍
+        </div>
+        
+        <!-- Tombol Musik (Dipindah ke Bawah Teks Persis) -->
+        <button id="music-btn" class="mt-8 px-6 py-3 bg-white/80 backdrop-blur-md border-2 border-pink-300 rounded-full text-pink-600 font-bold hover:bg-pink-100 transition-colors shadow-[0_0_15px_rgba(244,114,182,0.5)] flex items-center justify-center gap-2 text-sm md:text-base outline-none cursor-pointer">
+            ⏸️ Jeda Lagu
+        </button>
+    </div>
 
     <!-- Start Screen Overlay -->
-    <div id="start-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center">
+    <div id="start-screen" class="absolute inset-0 z-50 flex flex-col items-center justify-center pointer-events-auto">
         <h1 class="text-4xl md:text-5xl font-bold text-pink-600 mb-8 font-['Dancing_Script'] drop-shadow-md text-center px-4 leading-tight">Ada pesan untukmu...</h1>
-        <button id="play-btn" class="group relative px-8 py-3 md:py-4 bg-white/80 border-2 border-pink-300 rounded-full text-pink-600 font-semibold text-base md:text-lg hover:bg-pink-50 hover:text-pink-700 transition-all duration-300 shadow-[0_0_20px_rgba(244,114,182,0.4)] hover:shadow-[0_0_30px_rgba(244,114,182,0.6)] transform hover:scale-105 outline-none">
+        <button id="play-btn" class="group relative px-8 py-3 bg-white/80 border-2 border-pink-300 rounded-full text-pink-600 font-semibold text-base md:text-lg hover:bg-pink-50 hover:text-pink-700 transition-all duration-300 shadow-[0_0_20px_rgba(244,114,182,0.4)] hover:shadow-[0_0_30px_rgba(244,114,182,0.6)] transform hover:scale-105 outline-none cursor-pointer">
             Buka Pesan 💌
             <span class="absolute inset-0 rounded-full border-2 border-pink-400 animate-ping opacity-20 pointer-events-none"></span>
         </button>
@@ -235,7 +235,7 @@
             const startScreen = document.getElementById('start-screen');
             const playBtn = document.getElementById('play-btn');
             const audio = document.getElementById('bgm');
-            const finalMessage = document.getElementById('final-message');
+            const finalContainer = document.getElementById('final-container');
             const musicBtn = document.getElementById('music-btn');
             const gemoySticker = document.getElementById('gemoy-sticker');
             const particlesContainer = document.getElementById('particles');
@@ -261,10 +261,8 @@
                 const isHeart = Math.random() > 0.3;
                 if(isHeart) {
                     particle.innerHTML = '🤍';
-                    // Ukuran responsif untuk partikel
-                    const isMobile = window.innerWidth < 768;
-                    const baseSize = isMobile ? 8 : 10;
-                    particle.style.fontSize = Math.random() * 10 + baseSize + 'px';
+                    const baseSize = window.innerWidth < 768 ? 8 : 12;
+                    particle.style.fontSize = Math.random() * 8 + baseSize + 'px';
                     particle.style.color = Math.random() > 0.5 ? '#fbcfe8' : '#ffffff';
                 } else {
                     particle.innerHTML = '✨';
@@ -272,13 +270,13 @@
                 }
 
                 particle.style.left = Math.random() * 100 + 'vw';
-                particle.style.animationDuration = Math.random() * 5 + 5 + 's';
+                particle.style.animationDuration = Math.random() * 5 + 6 + 's';
                 
                 particlesContainer.appendChild(particle);
 
                 setTimeout(() => {
                     particle.remove();
-                }, 10000);
+                }, 11000);
             }
 
             // Memulai pengalaman
@@ -292,31 +290,24 @@
                 let audioPromise = audio.play();
                 if (audioPromise !== undefined) {
                     audioPromise.catch(error => {
-                        console.log("Audio autoplay dicegah, tapi animasi berlanjut.");
+                        console.log("Autoplay dicegah.");
                     });
                 }
 
                 gemoySticker.classList.remove('hidden');
 
-                // Generator partikel menyesuaikan ukuran layar
                 const particleInterval = window.innerWidth < 768 ? 600 : 400; 
                 setInterval(createParticle, particleInterval);
 
                 timings.forEach(lyric => {
                     const el = document.getElementById(lyric.id);
-                    
-                    setTimeout(() => {
-                        el.classList.add('show');
-                    }, lyric.show);
-
-                    setTimeout(() => {
-                        el.classList.remove('show');
-                    }, lyric.hide);
+                    setTimeout(() => { el.classList.add('show'); }, lyric.show);
+                    setTimeout(() => { el.classList.remove('show'); }, lyric.hide);
                 });
 
+                // Tampilkan Container Akhir (Berisi Teks & Tombol)
                 setTimeout(() => {
-                    finalMessage.classList.add('show');
-                    musicBtn.classList.add('show');
+                    finalContainer.classList.add('show');
                 }, finalMessageTime);
             });
 
